@@ -1,0 +1,104 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 18px;
+}
+
+.item:last-child {
+  padding-bottom: 0;
+}
+
+.connector {
+  position: absolute;
+  left: 11px;
+  top: 24px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--surface-border);
+}
+
+.circle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  z-index: 1;
+}
+
+.circleEndpoint {
+  background: var(--panel-green-end, var(--emerald));
+}
+
+.circleDone {
+  background: var(--emerald);
+}
+
+.circlePending {
+  background: var(--accent-gold, #e8a33d);
+}
+
+.content {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.name {
+  font-size: 0.88rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.time {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.pill {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill_completed {
+  background: #e3f1e4;
+  color: var(--emerald-deep);
+}
+
+.pill_checked_in {
+  background: #e1eef5;
+  color: #2b6a8a;
+}
+
+.pill_pending {
+  background: #faf1de;
+  color: #a06b1f;
+}
+
+.pill_missed {
+  background: #f6e2de;
+  color: var(--error);
+}

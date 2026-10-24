@@ -1,0 +1,47 @@
+:root {
+  --ink: #15291a;
+  --panel-green-start: #37663a;
+  --panel-green-end: #48c251;
+  --surface: #faf9f6;
+  --surface-border: #e1ded4;
+  --emerald: #2e7d32;
+  --emerald-deep: #1b5e20;
+  --accent-gold: #ffc857;
+  --muted: #5b6b63;
+  --muted-on-dark: #cfe3d2;
+  --text-on-dark: #faf9f6;
+  --error: #b3482f;
+
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "IBM Plex Sans", -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

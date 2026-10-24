@@ -1,0 +1,59 @@
+.svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+}
+
+.streets line {
+  stroke: var(--text-on-dark);
+  stroke-width: 1.5;
+  stroke-opacity: 0.1;
+}
+
+.routePath {
+  stroke-dasharray: 820;
+  stroke-dashoffset: 820;
+  animation: draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: 0.3s;
+}
+
+.routeGlow {
+  stroke-dasharray: 820;
+  stroke-dashoffset: 820;
+  animation: draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: 0.3s;
+}
+
+.pin {
+  opacity: 0;
+  animation: appear 0.5s ease forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .routePath,
+  .routeGlow {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .pin {
+    opacity: 1;
+    animation: none;
+  }
+}

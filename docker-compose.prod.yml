@@ -1,0 +1,84 @@
+# PRODUCTION compose. The dev docker-compose.yml publishes Postgres on a
+# public port with a hardcoded password and ships a pgAdmin with a default
+# login — fine on a laptop, never on a public server. This file instead:
+#   - publishes NOTHING to the internet; backend/web bind to 127.0.0.1 only
+#     (the host's Nginx is the only way in, with HTTPS)
+#   - takes every secret from .env (see .env.prod.example)
+#   - has no pgAdmin of its own — the VPS's existing pgAdmin connects over
+#     the named network `fieldforce_net` (see DEPLOY.md step 6)
+#
+# MEMORY SAFETY (this VPS is shared and has no swap): if RAM ever runs out,
+# the kernel kills whichever process scores highest — roughly "biggest user
+# of RAM" — and on this server that is AttendPro's backend (~1.8 GB), a
+# production service we must not take down. `oom_score_adj` below pushes
+# every FieldForce container ABOVE it, so FieldForce is always sacrificed
+# first; `mem_limit` stops any one of them growing without bound.
+services:
+  postgres:
+    image: postgres:16
+    container_name: fieldforce_postgres
+    restart: unless-stopped
+    mem_limit: 512m
+    oom_score_adj: 700
+    environment:
+      POSTGRES_USER: fieldforce
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: fieldforce_db
+    volumes:
+      - fieldforce_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fieldforce -d fieldforce_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: fieldforce_backend
+    restart: unless-stopped
+    mem_limit: 768m
+    oom_score_adj: 800
+    environment:
+      DATABASE_URL: postgresql+psycopg2://fieldforce:${POSTGRES_PASSWORD}@postgres:5432/fieldforce_db
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      ENVIRONMENT: production
+      MAPBOX_SECRET_TOKEN: ${MAPBOX_SECRET_TOKEN:?set MAPBOX_SECRET_TOKEN in .env}
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8011:8000"
+
+  web:
+    build:
+      context: ./web
+      args:
+        # Baked into the JS bundle at build time — changing either value
+        # means rebuilding this image, not just restarting it.
+        VITE_API_BASE_URL: ${PUBLIC_URL:?set PUBLIC_URL in .env}
+        VITE_MAPBOX_TOKEN: ${MAPBOX_PUBLIC_TOKEN:?set MAPBOX_PUBLIC_TOKEN in .env}
+    container_name: fieldforce_web
+    restart: unless-stopped
+    mem_limit: 128m
+    oom_score_adj: 800
+    ports:
+      - "127.0.0.1:8012:80"
+
+  osrm:
+    image: osrm/osrm-backend
+    container_name: fieldforce_osrm
+    restart: unless-stopped
+    mem_limit: 2g
+    oom_score_adj: 900
+    volumes:
+      - ./osrm-data:/data:ro
+    command: osrm-routed --algorithm mld /data/eastern-zone-latest.osrm
+
+volumes:
+  fieldforce_postgres_data:
+
+networks:
+  default:
+    name: fieldforce_net

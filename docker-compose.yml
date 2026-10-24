@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: fieldforce_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fieldforce
+      POSTGRES_PASSWORD: fieldforce_db
+      POSTGRES_DB: fieldforce_db
+    volumes:
+      - fieldforce_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5442:5432"   # host port chosen to avoid clashing with other projects' Postgres instances
+
+  backend:
+    build: ./backend
+    container_name: fieldforce_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/alembic/versions:/app/alembic/versions
+    depends_on:
+      - postgres
+    ports:
+      - "8011:8000"   # moved from 8010 — that port was taken by another local project
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: fieldforce_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@democlient.in
+      PGADMIN_DEFAULT_PASSWORD: fieldforce_admin123
+    volumes:
+      - fieldforce_pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    ports:
+      - "5051:80"   # 5050 is likely taken by another project's pgAdmin — adjust if this clashes too
+
+  osrm:
+    image: osrm/osrm-backend
+    container_name: fieldforce_osrm
+    restart: unless-stopped
+    volumes:
+      - ./osrm-data:/data
+    # The .osrm file must exist BEFORE this starts — see README's
+    # one-time data preparation steps (osrm-extract/partition/customize).
+    command: osrm-routed --algorithm mld /data/eastern-zone-latest.osrm
+    ports:
+      - "5004:5000"   # host port for manual testing; the backend reaches this over the internal network as "osrm:5000"
+
+volumes:
+  fieldforce_postgres_data:
+    name: fieldforce_fieldforce_postgres_data
+  fieldforce_pgadmin_data:
+    name: fieldforce_fieldforce_pgadmin_data

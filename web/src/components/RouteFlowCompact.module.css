@@ -1,0 +1,93 @@
+.wrap {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.arrow {
+  stroke: var(--emerald);
+  stroke-width: 2.5;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw 0.5s ease forwards;
+  animation-delay: var(--delay);
+}
+
+.returnArrow {
+  stroke: var(--accent-gold, #e8a33d);
+  stroke-width: 2.5;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw 0.5s ease forwards;
+  animation-delay: var(--delay);
+}
+
+.arrowhead {
+  stroke: currentColor;
+}
+
+.node {
+  opacity: 0;
+  animation: appear 0.35s ease forwards;
+  animation-delay: var(--delay);
+}
+
+.nodeStart {
+  fill: var(--panel-green-end, var(--emerald));
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.nodeStop {
+  fill: var(--emerald);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.nodeReturn {
+  fill: var(--accent-gold, #e8a33d);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.nodeNumber {
+  fill: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+.nodeLabel {
+  fill: var(--ink);
+  font-size: 12.5px;
+  font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow,
+  .returnArrow {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .node {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
